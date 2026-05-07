@@ -3,34 +3,321 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <title>Backco</title>
-
+  <title>Backco — Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
   <style>
-    * {
-      box-sizing: border-box;
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --earth:    #1a1a14;
+      --bark:     #2c2416;
+      --moss:     #3d4a2e;
+      --sage:     #7a8c5e;
+      --stone:    #a89f8c;
+      --cream:    #f0ebe0;
+      --accent:   #c8a951;
+      --danger:   #c0392b;
     }
 
-    body {
-      margin: 0;
-      min-height: 100vh;
+    html, body {
+      height: 100%;
+      background: var(--earth);
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      overflow: hidden;
+    }
+
+    /* Background texture */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 80%, rgba(61,74,46,0.45) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 80% at 80% 20%, rgba(44,36,22,0.6) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Grain overlay */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.6;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    /* Left panel */
+    .left {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 3rem;
+      border-right: 1px solid rgba(168,159,140,0.12);
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .brand-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 4rem;
+      letter-spacing: 0.08em;
+      color: var(--cream);
+      line-height: 1;
+    }
+
+    .brand-sub {
+      font-size: 0.7rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--stone);
+      font-weight: 300;
+    }
+
+    .tagline {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 5.5rem;
+      line-height: 0.92;
+      color: var(--moss);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      user-select: none;
+    }
+
+    .tagline span { color: var(--accent); }
+
+    .left-foot {
+      font-size: 0.7rem;
+      color: var(--stone);
+      letter-spacing: 0.1em;
+      opacity: 0.6;
+    }
+
+    /* Right panel */
+    .right {
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #111;
-      color: #fff;
-      font-family: Arial, Helvetica, sans-serif;
+      padding: 3rem;
     }
 
-    h1 {
-      margin: 0;
-      font-size: 48px;
-      font-weight: 700;
-      letter-spacing: -1px;
+    .card {
+      width: 100%;
+      max-width: 380px;
+    }
+
+    .card-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.2rem;
+      letter-spacing: 0.08em;
+      color: var(--cream);
+      margin-bottom: 0.25rem;
+    }
+
+    .card-hint {
+      font-size: 0.8rem;
+      color: var(--stone);
+      margin-bottom: 2.5rem;
+      font-weight: 300;
+    }
+
+    .field {
+      margin-bottom: 1.25rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.68rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--stone);
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    input {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(168,159,140,0.18);
+      border-radius: 4px;
+      padding: 0.85rem 1rem;
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    input::placeholder { color: rgba(168,159,140,0.35); }
+
+    input:focus {
+      border-color: var(--accent);
+      background: rgba(200,169,81,0.05);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 1rem;
+      margin-top: 0.5rem;
+      background: var(--accent);
+      color: var(--earth);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.2rem;
+      letter-spacing: 0.1em;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .btn:hover  { background: #d4b55a; }
+    .btn:active { transform: scale(0.99); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .error-msg {
+      margin-top: 1rem;
+      padding: 0.75rem 1rem;
+      background: rgba(192,57,43,0.15);
+      border: 1px solid rgba(192,57,43,0.3);
+      border-radius: 4px;
+      color: #e57373;
+      font-size: 0.82rem;
+      display: none;
+    }
+
+    .error-msg.show { display: block; }
+
+    .card-foot {
+      margin-top: 2rem;
+      font-size: 0.75rem;
+      color: var(--stone);
+      text-align: center;
+    }
+
+    .card-foot a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .card-foot a:hover { text-decoration: underline; }
+
+    @media (max-width: 700px) {
+      .page { grid-template-columns: 1fr; }
+      .left  { display: none; }
     }
   </style>
 </head>
 <body>
-  <h1>This is working</h1>
+<div class="page">
+  <!-- Left -->
+  <div class="left">
+    <div class="brand">
+      <div class="brand-logo">BACKCO</div>
+      <div class="brand-sub">Backcountry Landscaping · backco.us</div>
+    </div>
+    <div class="tagline">Shape<br>the<br><span>Land.</span></div>
+    <div class="left-foot">© 2026 Backcountry Landscaping LLC</div>
+  </div>
+
+  <!-- Right -->
+  <div class="right">
+    <div class="card">
+      <div class="card-title">Sign In</div>
+      <div class="card-hint">Enter your credentials to access the portal.</div>
+
+      <div class="field">
+        <label for="username">Username or Email</label>
+        <input id="username" type="text" placeholder="yourname" autocomplete="username" />
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" type="password" placeholder="••••••••" autocomplete="current-password" />
+      </div>
+
+      <button class="btn" id="loginBtn" onclick="handleLogin()">Enter</button>
+
+      <div class="error-msg" id="errorMsg"></div>
+
+      <div class="card-foot">
+        Need an account? <a href="/signup">Create one</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/js/backco-auth.js"></script>
+<script>
+  // Redirect if already logged in
+  Auth.redirectIfAuthed();
+
+  const btn      = document.getElementById('loginBtn');
+  const errorMsg = document.getElementById('errorMsg');
+
+  // Allow Enter key
+  document.getElementById('password').addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleLogin();
+  });
+  document.getElementById('username').addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleLogin();
+  });
+
+  function showError(msg) {
+    errorMsg.textContent = msg;
+    errorMsg.classList.add('show');
+  }
+
+  async function handleLogin() {
+    errorMsg.classList.remove('show');
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+
+    if (!username || !password) {
+      showError('Please fill in all fields.');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Checking...';
+
+    try {
+      const res  = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        Auth.save(data.token, data.user);
+        window.location.href = '/admin';
+      } else {
+        showError(data.message || 'Login failed.');
+        btn.disabled = false;
+        btn.textContent = 'Enter';
+      }
+    } catch {
+      showError('Connection error. Is the server running?');
+      btn.disabled = false;
+      btn.textContent = 'Enter';
+    }
+  }
+</script>
 </body>
 </html>

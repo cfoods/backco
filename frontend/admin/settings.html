@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Backco — Settings</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Outfit', sans-serif; background: #f5f5f3; color: #1a1a1a; }
+    #page-content { padding-top: 64px; }
+    .page { max-width: 760px; margin: 0 auto; padding: 2rem; }
+
+    .page-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .page-sub   { font-size: 0.88rem; color: #6b7280; margin-bottom: 2rem; }
+
+    .section {
+      background: #fff;
+      border: 1px solid #e5e5e1;
+      border-radius: 10px;
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+
+    .section-header {
+      padding: 1.1rem 1.5rem;
+      border-bottom: 1px solid #f3f4f6;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .section-title { font-size: 0.95rem; font-weight: 700; }
+    .section-sub   { font-size: 0.8rem; color: #9ca3af; margin-top: 0.1rem; }
+
+    .section-body { padding: 1.5rem; }
+
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+    .field-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+    .field { margin-bottom: 1rem; }
+    .field:last-child { margin-bottom: 0; }
+
+    label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #6b7280;
+      margin-bottom: 0.35rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 0.65rem 0.9rem;
+      border: 1px solid #e5e5e1;
+      border-radius: 7px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.15s;
+      background: #fff;
+      color: #1a1a1a;
+    }
+
+    input:focus, textarea:focus { border-color: #1c3d2e; }
+    textarea { resize: vertical; min-height: 80px; }
+
+    .btn-primary {
+      padding: 0.65rem 1.5rem;
+      background: #1c3d2e;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-primary:hover { background: #245038; }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .msg {
+      padding: 0.65rem 1rem;
+      border-radius: 7px;
+      font-size: 0.83rem;
+      margin-top: 1rem;
+      display: none;
+    }
+    .msg.show    { display: block; }
+    .msg.success { background: #dcfce7; color: #16a34a; }
+    .msg.error   { background: #fee2e2; color: #dc2626; }
+
+    .save-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 1.5rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid #f3f4f6;
+    }
+
+    @media (max-width: 600px) {
+      .field-row, .field-row-3 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div id="header-placeholder"></div>
+
+  <div id="page-content" style="display:none">
+    <div class="page">
+      <div class="page-title">Settings</div>
+      <div class="page-sub">Manage your business information and account settings.</div>
+
+      <!-- Business Info -->
+      <div class="section">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Business Information</div>
+            <div class="section-sub">This appears on all invoices and estimates.</div>
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="field-row">
+            <div class="field">
+              <label>Business Name</label>
+              <input type="text" id="s-bizName" placeholder="Backcountry Landscape Construction" />
+            </div>
+            <div class="field">
+              <label>Owner Name</label>
+              <input type="text" id="s-ownerName" placeholder="Brady Smith" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Street Address</label>
+            <input type="text" id="s-address" placeholder="123 Main St" />
+          </div>
+
+          <div class="field-row-3">
+            <div class="field">
+              <label>City</label>
+              <input type="text" id="s-city" placeholder="Livingston" />
+            </div>
+            <div class="field">
+              <label>State</label>
+              <input type="text" id="s-state" placeholder="MT" maxlength="2" />
+            </div>
+            <div class="field">
+              <label>ZIP</label>
+              <input type="text" id="s-zip" placeholder="59047" />
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label>Phone</label>
+              <input type="tel" id="s-phone" placeholder="(406) 555-0100" />
+            </div>
+            <div class="field">
+              <label>Email</label>
+              <input type="email" id="s-email" placeholder="info@backco.us" />
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label>Website</label>
+              <input type="text" id="s-website" placeholder="backco.us" />
+            </div>
+            <div class="field">
+              <label>Tax ID / EIN (optional)</label>
+              <input type="text" id="s-taxId" placeholder="XX-XXXXXXX" />
+            </div>
+          </div>
+
+          <div class="save-row">
+            <button class="btn-primary" onclick="saveBizInfo()">Save Business Info</button>
+            <div class="msg" id="biz-msg"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Invoice Defaults -->
+      <div class="section">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Invoice Defaults</div>
+            <div class="section-sub">Pre-filled on every new invoice.</div>
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="field-row">
+            <div class="field">
+              <label>Invoice Prefix (optional)</label>
+              <input type="text" id="s-prefix" placeholder="e.g. BCL- → BCL-001" />
+            </div>
+            <div class="field">
+              <label>Default Tax Rate (%)</label>
+              <input type="number" id="s-taxRate" placeholder="0" min="0" max="100" step="0.5" />
+            </div>
+          </div>
+          <div class="field">
+            <label>Default Invoice Notes / Terms</label>
+            <textarea id="s-terms" placeholder="Payment is due within 30 days. Thank you for your business!"></textarea>
+          </div>
+
+          <div class="save-row">
+            <button class="btn-primary" onclick="saveInvoiceDefaults()">Save Defaults</button>
+            <div class="msg" id="inv-msg"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Change Password -->
+      <div class="section">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Change Password</div>
+            <div class="section-sub">You'll need your current password to update it.</div>
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="field">
+            <label>Current Password</label>
+            <input type="password" id="p-current" placeholder="••••••••" autocomplete="current-password" />
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label>New Password</label>
+              <input type="password" id="p-new" placeholder="Min. 8 characters" autocomplete="new-password" />
+            </div>
+            <div class="field">
+              <label>Confirm New Password</label>
+              <input type="password" id="p-confirm" placeholder="Repeat new password" autocomplete="new-password" />
+            </div>
+          </div>
+
+          <div class="save-row">
+            <button class="btn-primary" onclick="changePassword()">Update Password</button>
+            <div class="msg" id="pw-msg"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="/js/backco-auth.js"></script>
+  <script src="/js/admin-init.js"></script>
+  <script>
+    initAdmin('settings');
+
+    async function loadSettings() {
+      const token = Auth.getToken();
+      try {
+        const res  = await fetch('/api/settings', { headers: { Authorization: `Bearer ${token}` } });
+        const data = await res.json();
+        if (!data.success) return;
+        const s = data.data;
+        document.getElementById('s-bizName').value   = s.businessName || '';
+        document.getElementById('s-ownerName').value = s.ownerName    || '';
+        document.getElementById('s-address').value   = s.address      || '';
+        document.getElementById('s-city').value      = s.city         || '';
+        document.getElementById('s-state').value     = s.state        || '';
+        document.getElementById('s-zip').value       = s.zip          || '';
+        document.getElementById('s-phone').value     = s.phone        || '';
+        document.getElementById('s-email').value     = s.email        || '';
+        document.getElementById('s-website').value   = s.website      || '';
+        document.getElementById('s-taxId').value     = s.taxId        || '';
+        document.getElementById('s-prefix').value    = s.invoicePrefix  || '';
+        document.getElementById('s-taxRate').value   = s.defaultTaxRate || 0;
+        document.getElementById('s-terms').value     = s.defaultTerms   || '';
+      } catch {}
+    }
+
+    async function saveBizInfo() {
+      const token = Auth.getToken();
+      const body = {
+        businessName: document.getElementById('s-bizName').value.trim(),
+        ownerName:    document.getElementById('s-ownerName').value.trim(),
+        address:      document.getElementById('s-address').value.trim(),
+        city:         document.getElementById('s-city').value.trim(),
+        state:        document.getElementById('s-state').value.trim(),
+        zip:          document.getElementById('s-zip').value.trim(),
+        phone:        document.getElementById('s-phone').value.trim(),
+        email:        document.getElementById('s-email').value.trim(),
+        website:      document.getElementById('s-website').value.trim(),
+        taxId:        document.getElementById('s-taxId').value.trim()
+      };
+      await saveSettings(body, 'biz-msg');
+    }
+
+    async function saveInvoiceDefaults() {
+      const token = Auth.getToken();
+      const body = {
+        invoicePrefix:  document.getElementById('s-prefix').value.trim(),
+        defaultTaxRate: parseFloat(document.getElementById('s-taxRate').value) || 0,
+        defaultTerms:   document.getElementById('s-terms').value.trim()
+      };
+      await saveSettings(body, 'inv-msg');
+    }
+
+    async function saveSettings(body, msgId) {
+      const token = Auth.getToken();
+      const msgEl = document.getElementById(msgId);
+      try {
+        const res  = await fetch('/api/settings', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        showMsg(msgId, data.success ? 'Saved successfully.' : (data.message || 'Save failed.'), data.success ? 'success' : 'error');
+      } catch {
+        showMsg(msgId, 'Connection error.', 'error');
+      }
+    }
+
+    async function changePassword() {
+      const current = document.getElementById('p-current').value;
+      const newPw   = document.getElementById('p-new').value;
+      const confirm = document.getElementById('p-confirm').value;
+
+      if (newPw !== confirm) { showMsg('pw-msg', 'New passwords do not match.', 'error'); return; }
+      if (newPw.length < 8)  { showMsg('pw-msg', 'Password must be at least 8 characters.', 'error'); return; }
+
+      const token = Auth.getToken();
+      try {
+        const res  = await fetch('/api/settings/password', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ currentPassword: current, newPassword: newPw })
+        });
+        const data = await res.json();
+        if (data.success) {
+          document.getElementById('p-current').value = '';
+          document.getElementById('p-new').value     = '';
+          document.getElementById('p-confirm').value = '';
+        }
+        showMsg('pw-msg', data.success ? 'Password updated.' : (data.message || 'Failed.'), data.success ? 'success' : 'error');
+      } catch {
+        showMsg('pw-msg', 'Connection error.', 'error');
+      }
+    }
+
+    function showMsg(id, text, type) {
+      const el = document.getElementById(id);
+      el.textContent = text;
+      el.className   = `msg show ${type}`;
+      setTimeout(() => el.classList.remove('show'), 4000);
+    }
+
+    loadSettings();
+  </script>
+</body>
+</html>

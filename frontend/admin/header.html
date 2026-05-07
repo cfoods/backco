@@ -15,11 +15,7 @@
     font-family: 'Outfit', sans-serif;
   }
 
-  .h-brand img {
-    height: 42px;
-    width: auto;
-    display: block;
-  }
+  .h-brand img { height: 42px; width: auto; display: block; }
 
   .h-links {
     display: flex;
@@ -42,7 +38,6 @@
   .nav-link:hover  { background: #f3f4f6; color: #1c3d2e; }
   .nav-link.active { background: rgba(28,61,46,0.1); color: #1c3d2e; font-weight: 600; }
 
-  /* Dropdown */
   .h-dropdown { position: relative; }
 
   .h-dropdown-menu {
@@ -76,16 +71,12 @@
 
   .h-dropdown-menu a:hover { background: #f9fafb; color: #1c3d2e; }
 
-  .h-dropdown-menu .dm-icon {
-    width: 28px;
-    height: 28px;
+  .dm-icon {
+    width: 28px; height: 28px;
     border-radius: 6px;
     background: rgba(28,61,46,0.08);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.9rem;
-    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.9rem; flex-shrink: 0;
   }
 
   .h-right {
@@ -104,16 +95,12 @@
   }
 
   .h-avatar {
-    width: 32px;
-    height: 32px;
+    width: 32px; height: 32px;
     border-radius: 50%;
     background: #1c3d2e;
     color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 0.85rem;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.85rem;
     font-family: 'Outfit', sans-serif;
   }
 
@@ -129,8 +116,20 @@
     cursor: pointer;
     transition: all 0.15s;
   }
-
   .h-signout:hover { border-color: #1c3d2e; color: #1c3d2e; }
+
+  .h-settings {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px; height: 34px;
+    border-radius: 6px;
+    color: #6b7280;
+    text-decoration: none;
+    font-size: 1.1rem;
+    transition: all 0.15s;
+  }
+  .h-settings:hover { background: #f3f4f6; color: #1c3d2e; }
 </style>
 
 <header class="site-header">
@@ -144,12 +143,8 @@
     <div class="h-dropdown">
       <a href="/admin/create" class="nav-link" data-page="create">Create ▾</a>
       <div class="h-dropdown-menu">
-        <a href="/admin/invoice">
-          <span class="dm-icon">🧾</span> New Invoice
-        </a>
-        <a href="/admin/estimate">
-          <span class="dm-icon">📋</span> New Estimate
-        </a>
+        <a href="/admin/invoice"><span class="dm-icon">🧾</span> New Invoice</a>
+        <a href="/admin/estimate"><span class="dm-icon">📋</span> New Estimate</a>
       </div>
     </div>
 
@@ -161,6 +156,7 @@
   </nav>
 
   <div class="h-right">
+    <a href="/admin/settings" class="h-settings" title="Settings">⚙️</a>
     <div class="h-user">
       <div class="h-avatar" id="header-avatar">?</div>
       <span id="header-username">—</span>

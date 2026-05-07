@@ -1,14 +1,20 @@
 require('dotenv').config();
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
+const express     = require('express');
+const mongoose    = require('mongoose');
+const cors        = require('cors');
 const cookieParser = require('cookie-parser');
-const path = require('path');
+const path        = require('path');
 
-const authRoutes = require('./routes/auth');
 const { protect } = require('./middleware/auth');
 
-const app = express();
+// ── Routes ────────────────────────────────────────────────────────────────────
+const authRoutes      = require('./routes/auth');
+const customerRoutes  = require('./routes/customers');
+const invoiceRoutes   = require('./routes/invoices');
+const estimateRoutes  = require('./routes/estimates');
+const expenseRoutes   = require('./routes/expenses');
+
+const app  = express();
 const PORT = process.env.PORT || 3000;
 
 // ── Middleware ────────────────────────────────────────────────────────────────
@@ -21,37 +27,31 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // ── Public Static Files ───────────────────────────────────────────────────────
-// Login and signup are public — serve them directly
-app.use('/home', express.static(path.join(__dirname, 'frontend/home')));
-app.use('/signup', express.static(path.join(__dirname, 'frontend')));
+app.use('/home', express.static(path.join(__dirname, '../frontend/home')));
 
-// Serve signup.html explicitly
 app.get('/signup', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'signup.html'));
+  res.sendFile(path.join(__dirname, '../frontend/signup.html'));
 });
 
-// Root redirect to login
-app.get('/', (req, res) => {
-  res.redirect('/home');
-});
+app.get('/', (req, res) => res.redirect('/home'));
 
-// ── API Routes ────────────────────────────────────────────────────────────────
+// ── Public API ────────────────────────────────────────────────────────────────
 app.use('/api/auth', authRoutes);
 
-// ── Protected API Routes ──────────────────────────────────────────────────────
-// All /api/* routes below this line require auth
-app.use('/api/*', protect);
+// ── Protected API — all routes below require a valid JWT ──────────────────────
+app.use('/api/customers', protect, customerRoutes);
+app.use('/api/invoices',  protect, invoiceRoutes);
+app.use('/api/estimates', protect, estimateRoutes);
+app.use('/api/expenses',  protect, expenseRoutes);
 
-// ── Protected Frontend Routes ─────────────────────────────────────────────────
-// Serve admin and any future protected pages — token verified on the frontend
-// (frontend pages check token on load and redirect to /home if invalid)
-app.use('/admin', express.static(path.join(__dirname, 'frontend/admin')));
-app.get('/admin', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'admin', 'index.html'));
+// ── Protected Frontend ────────────────────────────────────────────────────────
+app.use('/admin', express.static(path.join(__dirname, '../frontend/admin')));
+app.get('/admin*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/admin/index.html'));
 });
 
-// Catch-all for any other frontend routes — serve from frontend folder
-app.use(express.static(path.join(__dirname, 'frontend')));
+// ── General Static ────────────────────────────────────────────────────────────
+app.use(express.static(path.join(__dirname, '../frontend')));
 
 // ── 404 ───────────────────────────────────────────────────────────────────────
 app.use((req, res) => {
@@ -64,19 +64,14 @@ app.use((req, res) => {
 // ── Error Handler ─────────────────────────────────────────────────────────────
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(err.status || 500).json({
-    success: false,
-    message: err.message || 'Internal server error.'
-  });
+  res.status(err.status || 500).json({ success: false, message: err.message || 'Server error.' });
 });
 
 // ── MongoDB + Start ───────────────────────────────────────────────────────────
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/backco')
   .then(() => {
     console.log('✅ MongoDB connected → backco');
-    app.listen(PORT, () => {
-      console.log(`🌲 Backco server running on http://localhost:${PORT}`);
-    });
+    app.listen(PORT, () => console.log(`🌲 Backco running on http://localhost:${PORT}`));
   })
   .catch(err => {
     console.error('❌ MongoDB connection failed:', err.message);

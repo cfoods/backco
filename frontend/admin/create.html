@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Backco — Create</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Outfit', sans-serif; background: #f5f5f3; color: #1a1a1a; }
+    #page-content { padding-top: 64px; }
+    .page { max-width: 800px; margin: 0 auto; padding: 3rem 2rem; }
+
+    .page-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .page-sub   { font-size: 0.88rem; color: #6b7280; margin-bottom: 2.5rem; }
+
+    .choices {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+
+    .choice-card {
+      background: #fff;
+      border: 2px solid #e5e5e1;
+      border-radius: 14px;
+      padding: 2.5rem 2rem;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 1rem;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .choice-card:hover {
+      border-color: #1c3d2e;
+      box-shadow: 0 8px 24px rgba(28,61,46,0.1);
+      transform: translateY(-2px);
+    }
+
+    .choice-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      background: rgba(28,61,46,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+    }
+
+    .choice-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+
+    .choice-desc {
+      font-size: 0.85rem;
+      color: #6b7280;
+      line-height: 1.6;
+    }
+
+    .choice-btn {
+      margin-top: 0.5rem;
+      padding: 0.6rem 1.5rem;
+      background: #1c3d2e;
+      color: #fff;
+      border-radius: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+    }
+
+    @media (max-width: 600px) { .choices { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div id="header-placeholder"></div>
+
+  <div id="page-content" style="display:none">
+    <div class="page">
+      <div class="page-title">Create New</div>
+      <div class="page-sub">Choose what you'd like to create.</div>
+
+      <div class="choices">
+        <a href="/admin/invoice" class="choice-card">
+          <div class="choice-icon">🧾</div>
+          <div class="choice-title">Invoice</div>
+          <div class="choice-desc">Bill a customer for completed work. Invoices track payment status and can be downloaded as PDFs.</div>
+          <button class="choice-btn">Create Invoice</button>
+        </a>
+
+        <a href="/admin/estimate" class="choice-card">
+          <div class="choice-icon">📋</div>
+          <div class="choice-title">Estimate</div>
+          <div class="choice-desc">Send a quote to a customer before work begins. Estimates can be converted to invoices later.</div>
+          <button class="choice-btn">Create Estimate</button>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/backco-auth.js"></script>
+  <script src="/js/admin-init.js"></script>
+  <script>initAdmin('create');</script>
+</body>
+</html>

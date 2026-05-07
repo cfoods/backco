@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Backco — Profit</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Outfit', sans-serif; background: #f5f5f3; color: #1a1a1a; }
+    #page-content { padding-top: 64px; }
+    .page { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+
+    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+    .page-title  { font-size: 1.6rem; font-weight: 700; }
+
+    select { padding: 0.6rem 1rem; border: 1px solid #e5e5e1; border-radius: 8px; font-family: 'Outfit', sans-serif; font-size: 0.88rem; background: #fff; outline: none; }
+
+    /* Big numbers */
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .sum-card {
+      background: #fff;
+      border: 1px solid #e5e5e1;
+      border-radius: 10px;
+      padding: 1.4rem 1.5rem;
+    }
+
+    .sum-label { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #9ca3af; margin-bottom: 0.5rem; }
+    .sum-value { font-size: 2rem; font-weight: 700; line-height: 1; }
+    .sum-note  { font-size: 0.78rem; color: #9ca3af; margin-top: 0.3rem; }
+    .green { color: #16a34a; }
+    .red   { color: #dc2626; }
+
+    /* Monthly table */
+    .card { background: #fff; border: 1px solid #e5e5e1; border-radius: 10px; overflow: hidden; margin-bottom: 1.5rem; }
+    .card-title { padding: 1.1rem 1.5rem; font-size: 0.95rem; font-weight: 600; border-bottom: 1px solid #f3f4f6; }
+    table { width: 100%; border-collapse: collapse; }
+    th { padding: 0.75rem 1.25rem; text-align: left; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #9ca3af; background: #fafafa; border-bottom: 1px solid #f3f4f6; }
+    td { padding: 1rem 1.25rem; font-size: 0.88rem; border-bottom: 1px solid #f9f9f8; color: #374151; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fafaf9; }
+
+    .bar-wrap { width: 100%; background: #f3f4f6; border-radius: 4px; height: 8px; overflow: hidden; }
+    .bar-fill  { height: 100%; border-radius: 4px; background: #1c3d2e; transition: width 0.4s; }
+
+    /* Category breakdown */
+    .cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .cat-item { display: flex; align-items: center; justify-content: space-between; padding: 0.7rem 0; border-bottom: 1px solid #f3f4f6; }
+    .cat-item:last-child { border-bottom: none; }
+    .cat-name { font-size: 0.88rem; color: #374151; text-transform: capitalize; }
+    .cat-amt  { font-size: 0.88rem; font-weight: 600; color: #1a1a1a; }
+
+    .empty-state { text-align: center; padding: 2rem; color: #9ca3af; font-size: 0.88rem; }
+
+    @media (max-width: 640px) { .cat-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div id="header-placeholder"></div>
+
+  <div id="page-content" style="display:none">
+    <div class="page">
+      <div class="page-header">
+        <div class="page-title">Profit & Loss</div>
+        <select id="yearSelect" onchange="loadData()"></select>
+      </div>
+
+      <div class="summary">
+        <div class="sum-card">
+          <div class="sum-label">Total Revenue</div>
+          <div class="sum-value green" id="p-revenue">$0</div>
+          <div class="sum-note">Paid invoices</div>
+        </div>
+        <div class="sum-card">
+          <div class="sum-label">Total Expenses</div>
+          <div class="sum-value red" id="p-expenses">$0</div>
+          <div class="sum-note">All logged expenses</div>
+        </div>
+        <div class="sum-card">
+          <div class="sum-label">Net Profit</div>
+          <div class="sum-value" id="p-net">$0</div>
+          <div class="sum-note">Revenue minus expenses</div>
+        </div>
+        <div class="sum-card">
+          <div class="sum-label">Profit Margin</div>
+          <div class="sum-value" id="p-margin">0%</div>
+          <div class="sum-note">Net / Revenue</div>
+        </div>
+      </div>
+
+      <!-- Monthly breakdown -->
+      <div class="card">
+        <div class="card-title">Monthly Breakdown</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Month</th>
+              <th>Revenue</th>
+              <th>Expenses</th>
+              <th>Net</th>
+              <th style="width:200px">Revenue Bar</th>
+            </tr>
+          </thead>
+          <tbody id="monthly-rows">
+            <tr><td colspan="5" class="empty-state">No data yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Expense categories -->
+      <div class="card">
+        <div class="card-title">Expenses by Category</div>
+        <div style="padding:1.25rem" id="cat-breakdown">
+          <div class="empty-state">No expense data.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/backco-auth.js"></script>
+  <script src="/js/admin-init.js"></script>
+  <script>
+    initAdmin('profit');
+
+    const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+    // Populate year select
+    const yearSel = document.getElementById('yearSelect');
+    const now = new Date().getFullYear();
+    for (let y = now; y >= now - 4; y--) {
+      const o = document.createElement('option');
+      o.value = y; o.textContent = y;
+      yearSel.appendChild(o);
+    }
+
+    async function loadData() {
+      const token = Auth.getToken();
+      const year  = parseInt(document.getElementById('yearSelect').value);
+      try {
+        const [iRes, eRes] = await Promise.all([
+          fetch('/api/invoices', { headers: { Authorization: `Bearer ${token}` } }),
+          fetch('/api/expenses', { headers: { Authorization: `Bearer ${token}` } })
+        ]);
+        if (!iRes.ok || !eRes.ok) return;
+        const { data: invoices } = await iRes.json();
+        const { data: expenses } = await eRes.json();
+
+        // Filter by year
+        const yearInv = invoices.filter(i => i.status === 'paid' && new Date(i.date).getFullYear() === year);
+        const yearExp = expenses.filter(e => new Date(e.date).getFullYear() === year);
+
+        const totalRev = yearInv.reduce((s,i) => s + i.total, 0);
+        const totalExp = yearExp.reduce((s,e) => s + e.amount, 0);
+        const net      = totalRev - totalExp;
+        const margin   = totalRev ? ((net / totalRev) * 100).toFixed(1) : 0;
+
+        const fmt = n => '$' + Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 2 });
+
+        document.getElementById('p-revenue').textContent  = fmt(totalRev);
+        document.getElementById('p-expenses').textContent = fmt(totalExp);
+        document.getElementById('p-net').textContent      = (net < 0 ? '-' : '') + fmt(net);
+        document.getElementById('p-net').className        = 'sum-value ' + (net >= 0 ? 'green' : 'red');
+        document.getElementById('p-margin').textContent   = margin + '%';
+        document.getElementById('p-margin').className     = 'sum-value ' + (parseFloat(margin) >= 0 ? 'green' : 'red');
+
+        // Monthly
+        const monthlyRev = Array(12).fill(0);
+        const monthlyExp = Array(12).fill(0);
+        yearInv.forEach(i => { monthlyRev[new Date(i.date).getMonth()] += i.total; });
+        yearExp.forEach(e => { monthlyExp[new Date(e.date).getMonth()] += e.amount; });
+        const maxRev = Math.max(...monthlyRev, 1);
+
+        const tbody = document.getElementById('monthly-rows');
+        tbody.innerHTML = MONTHS.map((m, idx) => {
+          const rev = monthlyRev[idx];
+          const exp = monthlyExp[idx];
+          const n   = rev - exp;
+          return `<tr>
+            <td>${m}</td>
+            <td class="green">$${rev.toFixed(2)}</td>
+            <td class="red">$${exp.toFixed(2)}</td>
+            <td style="font-weight:600" class="${n >= 0 ? 'green' : 'red'}">${n < 0 ? '-' : ''}$${Math.abs(n).toFixed(2)}</td>
+            <td><div class="bar-wrap"><div class="bar-fill" style="width:${(rev/maxRev*100).toFixed(1)}%"></div></div></td>
+          </tr>`;
+        }).join('');
+
+        // Categories
+        const cats = {};
+        yearExp.forEach(e => { cats[e.category] = (cats[e.category] || 0) + e.amount; });
+        const catEl = document.getElementById('cat-breakdown');
+        const entries = Object.entries(cats).sort((a,b) => b[1]-a[1]);
+        if (entries.length) {
+          catEl.innerHTML = `<div class="cat-grid">${entries.map(([cat, amt]) =>
+            `<div class="cat-item"><span class="cat-name">${cat}</span><span class="cat-amt">$${amt.toFixed(2)}</span></div>`
+          ).join('')}</div>`;
+        } else {
+          catEl.innerHTML = '<div class="empty-state">No expense data for this year.</div>';
+        }
+      } catch (err) { console.error(err); }
+    }
+
+    loadData();
+  </script>
+</body>
+</html>

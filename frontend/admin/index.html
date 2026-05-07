@@ -3,382 +3,257 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Backco — Admin</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <title>Backco — Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Outfit', sans-serif; background: #f5f5f3; color: #1a1a1a; }
+    #page-content { padding-top: 64px; }
+    .page { max-width: 1100px; margin: 0 auto; padding: 2rem; }
 
-    :root {
-      --earth:   #1a1a14;
-      --bark:    #2c2416;
-      --moss:    #3d4a2e;
-      --sage:    #7a8c5e;
-      --stone:   #a89f8c;
-      --cream:   #f0ebe0;
-      --accent:  #c8a951;
-      --border:  rgba(168,159,140,0.12);
-      --nav-h:   58px;
-    }
+    .page-title { font-size: 1.6rem; font-weight: 700; color: #1a1a1a; margin-bottom: 0.25rem; }
+    .page-sub   { font-size: 0.88rem; color: #6b7280; margin-bottom: 2rem; }
 
-    html, body {
-      height: 100%;
-      background: var(--earth);
-      color: var(--cream);
-      font-family: 'DM Sans', sans-serif;
-    }
-
-    /* ── NAV ───────────────────────────────────────────────── */
-    .nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      height: var(--nav-h);
-      background: rgba(26,26,20,0.92);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      padding: 0 1.5rem;
-      gap: 2rem;
-      z-index: 100;
-    }
-
-    .nav-brand {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.5rem;
-      letter-spacing: 0.1em;
-      color: var(--cream);
-      text-decoration: none;
-      flex-shrink: 0;
-    }
-
-    .nav-brand span { color: var(--accent); }
-
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 0.25rem;
-      flex: 1;
-    }
-
-    .nav-link {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      padding: 0.4rem 0.85rem;
-      border-radius: 4px;
-      color: var(--stone);
-      font-size: 0.82rem;
-      font-weight: 500;
-      letter-spacing: 0.04em;
-      text-decoration: none;
-      transition: color 0.15s, background 0.15s;
-      white-space: nowrap;
-    }
-
-    .nav-link:hover {
-      color: var(--cream);
-      background: rgba(255,255,255,0.05);
-    }
-
-    .nav-link.active {
-      color: var(--accent);
-      background: rgba(200,169,81,0.08);
-    }
-
-    .nav-link .icon { font-size: 0.9rem; opacity: 0.8; }
-
-    /* Separator */
-    .nav-sep {
-      width: 1px;
-      height: 20px;
-      background: var(--border);
-      flex-shrink: 0;
-    }
-
-    /* Right side of nav */
-    .nav-right {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      flex-shrink: 0;
-    }
-
-    .nav-user {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.78rem;
-      color: var(--stone);
-    }
-
-    .nav-avatar {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: var(--moss);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 0.9rem;
-      color: var(--cream);
-      letter-spacing: 0.05em;
-    }
-
-    .btn-logout {
-      padding: 0.35rem 0.85rem;
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      color: var(--stone);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.75rem;
-      letter-spacing: 0.06em;
-      cursor: pointer;
-      transition: border-color 0.15s, color 0.15s;
-    }
-
-    .btn-logout:hover {
-      border-color: var(--stone);
-      color: var(--cream);
-    }
-
-    /* ── MAIN CONTENT ──────────────────────────────────────── */
-    .main {
-      padding-top: var(--nav-h);
-      min-height: 100vh;
-    }
-
-    .content {
-      padding: 2.5rem 2rem;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-
-    /* Dashboard header */
-    .dash-header {
-      margin-bottom: 2.5rem;
-    }
-
-    .dash-greeting {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 2.8rem;
-      letter-spacing: 0.06em;
-      line-height: 1;
-      color: var(--cream);
-    }
-
-    .dash-greeting span { color: var(--accent); }
-
-    .dash-sub {
-      margin-top: 0.4rem;
-      font-size: 0.82rem;
-      color: var(--stone);
-      font-weight: 300;
-    }
-
-    /* Stat cards */
-    .cards {
+    /* Stats */
+    .stats {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
       gap: 1rem;
       margin-bottom: 2rem;
     }
 
     .stat-card {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 1.25rem 1.5rem;
-      transition: border-color 0.2s;
+      background: #fff;
+      border: 1px solid #e5e5e1;
+      border-radius: 10px;
+      padding: 1.4rem 1.5rem;
+      transition: box-shadow 0.2s;
     }
 
-    .stat-card:hover { border-color: rgba(168,159,140,0.25); }
+    .stat-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.07); }
 
     .stat-label {
-      font-size: 0.65rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--stone);
-      margin-bottom: 0.6rem;
-    }
-
-    .stat-value {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 2.2rem;
-      letter-spacing: 0.05em;
-      color: var(--cream);
-      line-height: 1;
-    }
-
-    .stat-note {
-      font-size: 0.7rem;
-      color: var(--sage);
-      margin-top: 0.35rem;
-    }
-
-    /* Info block */
-    .info-block {
-      background: rgba(61,74,46,0.12);
-      border: 1px solid rgba(61,74,46,0.25);
-      border-radius: 6px;
-      padding: 1.5rem;
-      margin-top: 1.5rem;
-    }
-
-    .info-block h3 {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.1rem;
+      font-size: 0.75rem;
+      font-weight: 600;
       letter-spacing: 0.08em;
-      color: var(--sage);
+      text-transform: uppercase;
+      color: #9ca3af;
       margin-bottom: 0.5rem;
     }
 
-    .info-block p {
-      font-size: 0.82rem;
-      color: var(--stone);
-      line-height: 1.65;
+    .stat-value {
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      line-height: 1;
+      margin-bottom: 0.3rem;
     }
 
-    /* Loading overlay */
-    #authCheck {
-      position: fixed;
-      inset: 0;
-      background: var(--earth);
+    .stat-note { font-size: 0.78rem; color: #6b7280; }
+    .stat-up   { color: #16a34a; }
+    .stat-down { color: #dc2626; }
+
+    /* Quick actions */
+    .section-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 1rem;
+    }
+
+    .quick-actions {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .qa-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1.25rem;
+      border-radius: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+    }
+
+    .qa-primary { background: #1c3d2e; color: #fff; }
+    .qa-primary:hover { background: #245038; }
+    .qa-secondary { background: #fff; color: #374151; border: 1px solid #e5e5e1; }
+    .qa-secondary:hover { border-color: #1c3d2e; color: #1c3d2e; }
+
+    /* Recent invoices */
+    .card {
+      background: #fff;
+      border: 1px solid #e5e5e1;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .card-header {
       display: flex;
       align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.5rem;
-      letter-spacing: 0.1em;
-      color: var(--stone);
+      justify-content: space-between;
+      padding: 1.1rem 1.5rem;
+      border-bottom: 1px solid #f3f4f6;
     }
 
-    .spinner {
-      width: 20px; height: 20px;
-      border: 2px solid var(--border);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      margin-right: 0.75rem;
+    .card-header h3 { font-size: 0.95rem; font-weight: 600; }
+    .card-header a  { font-size: 0.82rem; color: #1c3d2e; text-decoration: none; font-weight: 500; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      padding: 0.75rem 1.5rem;
+      text-align: left;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #9ca3af;
+      background: #fafafa;
+      border-bottom: 1px solid #f3f4f6;
     }
+    td {
+      padding: 0.9rem 1.5rem;
+      font-size: 0.88rem;
+      border-bottom: 1px solid #f9f9f8;
+      color: #374151;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fafaf9; }
 
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.65rem;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 600;
+    }
+    .badge-paid    { background: #dcfce7; color: #16a34a; }
+    .badge-pending { background: #fef9c3; color: #ca8a04; }
+    .badge-overdue { background: #fee2e2; color: #dc2626; }
 
-    /* Mobile nav collapse */
-    @media (max-width: 700px) {
-      .nav { padding: 0 1rem; gap: 1rem; }
-      .nav-link .icon { display: none; }
-      .nav-link { padding: 0.4rem 0.6rem; font-size: 0.75rem; }
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: #9ca3af;
+      font-size: 0.88rem;
     }
   </style>
 </head>
 <body>
+  <div id="header-placeholder"></div>
 
-<!-- Auth check overlay — hidden once verified -->
-<div id="authCheck">
-  <div class="spinner"></div>
-  BACKCO
-</div>
+  <div id="page-content" style="display:none">
+    <div class="page">
+      <div class="page-title">Dashboard</div>
+      <div class="page-sub" id="dash-date">—</div>
 
-<!-- ── NAV ─────────────────────────────────────────────────────── -->
-<nav class="nav" id="mainNav" style="display:none">
-  <a class="nav-brand" href="/admin">BACK<span>CO</span></a>
-
-  <div class="nav-links">
-    <a class="nav-link active" href="/admin" data-page="dashboard">
-      <span class="icon">⌂</span> Dashboard
-    </a>
-    <!-- Add more nav links here as you build pages -->
-    <!-- <a class="nav-link" href="/admin/jobs" data-page="jobs">
-      <span class="icon">📋</span> Jobs
-    </a> -->
-    <!-- <a class="nav-link" href="/admin/clients" data-page="clients">
-      <span class="icon">👤</span> Clients
-    </a> -->
-    <!-- <a class="nav-link" href="/admin/schedule" data-page="schedule">
-      <span class="icon">📅</span> Schedule
-    </a> -->
-  </div>
-
-  <div class="nav-right">
-    <div class="nav-user">
-      <div class="nav-avatar" id="navAvatar">?</div>
-      <span id="navUsername">—</span>
-    </div>
-    <div class="nav-sep"></div>
-    <button class="btn-logout" onclick="Auth.logout()">Sign Out</button>
-  </div>
-</nav>
-
-<!-- ── MAIN ─────────────────────────────────────────────────────── -->
-<main class="main" id="mainContent" style="display:none">
-  <div class="content">
-    <div class="dash-header">
-      <div class="dash-greeting">Good to see you, <span id="greetName">there</span>.</div>
-      <div class="dash-sub" id="greetSub">Loading portal...</div>
-    </div>
-
-    <div class="cards">
-      <div class="stat-card">
-        <div class="stat-label">Status</div>
-        <div class="stat-value" style="color: var(--sage)">Live</div>
-        <div class="stat-note">Portal is operational</div>
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-label">Total Revenue</div>
+          <div class="stat-value" id="stat-revenue">$0</div>
+          <div class="stat-note">All time</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Pending</div>
+          <div class="stat-value" id="stat-pending">0</div>
+          <div class="stat-note">Unpaid invoices</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Expenses</div>
+          <div class="stat-value" id="stat-expenses">$0</div>
+          <div class="stat-note">All time</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Net Profit</div>
+          <div class="stat-value" id="stat-profit">$0</div>
+          <div class="stat-note">Revenue minus expenses</div>
+        </div>
       </div>
-      <div class="stat-card">
-        <div class="stat-label">Database</div>
-        <div class="stat-value" style="color: var(--sage)">OK</div>
-        <div class="stat-note">MongoDB → backco</div>
+
+      <div class="section-title">Quick Actions</div>
+      <div class="quick-actions">
+        <a href="/admin/invoice"   class="qa-btn qa-primary">🧾 New Invoice</a>
+        <a href="/admin/estimate"  class="qa-btn qa-primary">📋 New Estimate</a>
+        <a href="/admin/customers" class="qa-btn qa-secondary">👤 Add Customer</a>
+        <a href="/admin/expenses"  class="qa-btn qa-secondary">➕ Log Expense</a>
       </div>
-      <div class="stat-card">
-        <div class="stat-label">Auth</div>
-        <div class="stat-value" style="color: var(--sage)">Active</div>
-        <div class="stat-note">JWT session valid</div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3>Recent Invoices</h3>
+          <a href="/admin/invoices">View all →</a>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Invoice #</th>
+              <th>Customer</th>
+              <th>Date</th>
+              <th>Amount</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="recent-invoices">
+            <tr><td colspan="5" class="empty-state">No invoices yet. <a href="/admin/invoice" style="color:#1c3d2e">Create one →</a></td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
-
-    <div class="info-block">
-      <h3>🌲 Backcountry Landscaping Portal</h3>
-      <p>
-        You're in. The auth system is wired up — login, signup, JWT verification, and protected routes are all live.
-        Nav links above are commented out and ready for you to uncomment as you build out new pages.
-        Every new page under <code>/admin/*</code> should include <code>backco-auth.js</code> and call
-        <code>Auth.requireAuth()</code> on load to stay protected.
-      </p>
-    </div>
   </div>
-</main>
 
-<script src="/js/backco-auth.js"></script>
-<script>
-  (async () => {
-    const ok = await Auth.requireAuth();
-    if (!ok) return; // requireAuth redirects to /home if invalid
+  <script src="/js/backco-auth.js"></script>
+  <script src="/js/admin-init.js"></script>
+  <script>
+    initAdmin('dashboard');
 
-    const user = Auth.getUser();
+    document.getElementById('dash-date').textContent =
+      new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
 
-    // Populate nav + greeting
-    if (user) {
-      document.getElementById('navAvatar').textContent  = user.username.charAt(0).toUpperCase();
-      document.getElementById('navUsername').textContent = user.username;
-      document.getElementById('greetName').textContent  = user.username;
-      document.getElementById('greetSub').textContent   =
-        `Logged in as ${user.email} · Role: ${user.role} · ${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}`;
+    // Load dashboard stats
+    async function loadStats() {
+      const token = Auth.getToken();
+      try {
+        const [invRes, expRes] = await Promise.all([
+          fetch('/api/invoices', { headers: { Authorization: `Bearer ${token}` } }),
+          fetch('/api/expenses', { headers: { Authorization: `Bearer ${token}` } })
+        ]);
+        if (invRes.ok) {
+          const { data: invoices } = await invRes.json();
+          const revenue = invoices.filter(i => i.status === 'paid').reduce((s, i) => s + i.total, 0);
+          const pending = invoices.filter(i => i.status === 'pending').length;
+          document.getElementById('stat-revenue').textContent = '$' + revenue.toLocaleString('en-US', { minimumFractionDigits: 2 });
+          document.getElementById('stat-pending').textContent = pending;
+
+          // Recent 5
+          const tbody = document.getElementById('recent-invoices');
+          if (invoices.length) {
+            tbody.innerHTML = invoices.slice(0, 5).map(inv => `
+              <tr>
+                <td><a href="/admin/invoice?id=${inv._id}" style="color:#1c3d2e;font-weight:600">#${inv.invoiceNumber}</a></td>
+                <td>${inv.customerName || '—'}</td>
+                <td>${new Date(inv.date).toLocaleDateString()}</td>
+                <td>$${inv.total.toFixed(2)}</td>
+                <td><span class="badge badge-${inv.status}">${inv.status}</span></td>
+              </tr>`).join('');
+          }
+        }
+        if (expRes.ok) {
+          const { data: expenses } = await expRes.json();
+          const total = expenses.reduce((s, e) => s + e.amount, 0);
+          document.getElementById('stat-expenses').textContent = '$' + total.toLocaleString('en-US', { minimumFractionDigits: 2 });
+        }
+      } catch {}
     }
 
-    // Show the page
-    document.getElementById('authCheck').style.display  = 'none';
-    document.getElementById('mainNav').style.display     = 'flex';
-    document.getElementById('mainContent').style.display = 'block';
-
-    // Highlight active nav link based on current path
-    const path = window.location.pathname;
-    document.querySelectorAll('.nav-link').forEach(link => {
-      link.classList.toggle('active', link.getAttribute('href') === path);
-    });
-  })();
-</script>
+    loadStats();
+  </script>
 </body>
 </html>

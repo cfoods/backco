@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Backco — Customers</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Outfit', sans-serif; background: #f5f5f3; color: #1a1a1a; }
+    #page-content { padding-top: 64px; }
+    .page { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .page-title { font-size: 1.6rem; font-weight: 700; }
+
+    .btn-primary {
+      padding: 0.6rem 1.25rem;
+      background: #1c3d2e;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-primary:hover { background: #245038; }
+
+    .toolbar {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .search-input {
+      flex: 1;
+      min-width: 220px;
+      padding: 0.6rem 1rem;
+      border: 1px solid #e5e5e1;
+      border-radius: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.88rem;
+      background: #fff;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .search-input:focus { border-color: #1c3d2e; }
+
+    /* Table */
+    .card {
+      background: #fff;
+      border: 1px solid #e5e5e1;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      padding: 0.75rem 1.25rem;
+      text-align: left;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #9ca3af;
+      background: #fafafa;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    td {
+      padding: 1rem 1.25rem;
+      font-size: 0.88rem;
+      border-bottom: 1px solid #f9f9f8;
+      color: #374151;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fafaf9; }
+
+    .cust-name { font-weight: 600; color: #1a1a1a; }
+    .cust-email { font-size: 0.8rem; color: #9ca3af; }
+
+    .action-link {
+      color: #1c3d2e;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.82rem;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+      font-family: 'Outfit', sans-serif;
+      margin-right: 0.75rem;
+    }
+    .action-link:hover { text-decoration: underline; }
+    .action-del { color: #dc2626; }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: #9ca3af;
+      font-size: 0.88rem;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: #fff;
+      border-radius: 12px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    }
+
+    .modal-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 1.5rem; }
+
+    .field { margin-bottom: 1rem; }
+    label { display: block; font-size: 0.75rem; font-weight: 600; color: #6b7280; margin-bottom: 0.35rem; letter-spacing: 0.05em; text-transform: uppercase; }
+    input, textarea {
+      width: 100%;
+      padding: 0.65rem 0.9rem;
+      border: 1px solid #e5e5e1;
+      border-radius: 7px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    input:focus, textarea:focus { border-color: #1c3d2e; }
+    textarea { resize: vertical; min-height: 70px; }
+
+    .modal-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+    .modal-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: flex-end;
+      margin-top: 1.5rem;
+    }
+
+    .btn-cancel {
+      padding: 0.6rem 1.25rem;
+      background: transparent;
+      border: 1px solid #e5e5e1;
+      border-radius: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: #6b7280;
+    }
+    .btn-cancel:hover { border-color: #9ca3af; }
+
+    .msg { margin-top: 0.75rem; font-size: 0.82rem; color: #dc2626; }
+  </style>
+</head>
+<body>
+  <div id="header-placeholder"></div>
+
+  <div id="page-content" style="display:none">
+    <div class="page">
+      <div class="page-header">
+        <div class="page-title">Customers</div>
+        <button class="btn-primary" onclick="openModal()">+ Add Customer</button>
+      </div>
+
+      <div class="toolbar">
+        <input class="search-input" id="searchInput" type="text" placeholder="Search by name, email, or phone..." oninput="filterCustomers()" />
+      </div>
+
+      <div class="card">
+        <table>
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Phone</th>
+              <th>Address</th>
+              <th>Invoices</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="customer-list">
+            <tr><td colspan="5" class="empty-state">No customers yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Customer Modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-title" id="modal-title">Add Customer</div>
+      <input type="hidden" id="edit-id" />
+
+      <div class="modal-row">
+        <div class="field">
+          <label>First Name</label>
+          <input type="text" id="f-first" placeholder="John" />
+        </div>
+        <div class="field">
+          <label>Last Name</label>
+          <input type="text" id="f-last" placeholder="Smith" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="f-email" placeholder="john@example.com" />
+      </div>
+
+      <div class="modal-row">
+        <div class="field">
+          <label>Phone</label>
+          <input type="tel" id="f-phone" placeholder="(406) 555-0100" />
+        </div>
+        <div class="field">
+          <label>Company (optional)</label>
+          <input type="text" id="f-company" placeholder="Company name" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Address</label>
+        <textarea id="f-address" placeholder="123 Main St, Livingston, MT 59047"></textarea>
+      </div>
+
+      <div class="field">
+        <label>Notes (optional)</label>
+        <textarea id="f-notes" placeholder="Any notes about this customer..."></textarea>
+      </div>
+
+      <div class="msg" id="modal-msg"></div>
+
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn-primary" onclick="saveCustomer()">Save Customer</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/backco-auth.js"></script>
+  <script src="/js/admin-init.js"></script>
+  <script>
+    initAdmin('customers');
+
+    let customers = [];
+
+    async function loadCustomers() {
+      const token = Auth.getToken();
+      try {
+        const res  = await fetch('/api/customers', { headers: { Authorization: `Bearer ${token}` } });
+        const data = await res.json();
+        if (data.success) { customers = data.data; renderCustomers(customers); }
+      } catch { console.error('Failed to load customers'); }
+    }
+
+    function renderCustomers(list) {
+      const tbody = document.getElementById('customer-list');
+      if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No customers yet. Add one to get started.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = list.map(c => `
+        <tr>
+          <td>
+            <div class="cust-name">${c.firstName} ${c.lastName}${c.company ? ` — ${c.company}` : ''}</div>
+            <div class="cust-email">${c.email || ''}</div>
+          </td>
+          <td>${c.phone || '—'}</td>
+          <td>${c.address ? c.address.replace(/\n/g, ', ') : '—'}</td>
+          <td>${c.invoiceCount || 0}</td>
+          <td>
+            <button class="action-link" onclick="editCustomer('${c._id}')">Edit</button>
+            <button class="action-link" onclick="window.location='/admin/invoices?customer=${c._id}'">Invoices</button>
+            <button class="action-link action-del" onclick="deleteCustomer('${c._id}')">Delete</button>
+          </td>
+        </tr>`).join('');
+    }
+
+    function filterCustomers() {
+      const q = document.getElementById('searchInput').value.toLowerCase();
+      renderCustomers(customers.filter(c =>
+        `${c.firstName} ${c.lastName} ${c.email} ${c.phone} ${c.company}`.toLowerCase().includes(q)
+      ));
+    }
+
+    function openModal(reset = true) {
+      if (reset) {
+        document.getElementById('modal-title').textContent = 'Add Customer';
+        document.getElementById('edit-id').value = '';
+        ['first','last','email','phone','company','address','notes'].forEach(f =>
+          document.getElementById(`f-${f}`).value = '');
+      }
+      document.getElementById('modal-msg').textContent = '';
+      document.getElementById('modalOverlay').classList.add('open');
+    }
+
+    function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+
+    function editCustomer(id) {
+      const c = customers.find(x => x._id === id);
+      if (!c) return;
+      document.getElementById('modal-title').textContent = 'Edit Customer';
+      document.getElementById('edit-id').value   = c._id;
+      document.getElementById('f-first').value   = c.firstName || '';
+      document.getElementById('f-last').value    = c.lastName  || '';
+      document.getElementById('f-email').value   = c.email     || '';
+      document.getElementById('f-phone').value   = c.phone     || '';
+      document.getElementById('f-company').value = c.company   || '';
+      document.getElementById('f-address').value = c.address   || '';
+      document.getElementById('f-notes').value   = c.notes     || '';
+      openModal(false);
+    }
+
+    async function saveCustomer() {
+      const token = Auth.getToken();
+      const id    = document.getElementById('edit-id').value;
+      const body  = {
+        firstName: document.getElementById('f-first').value.trim(),
+        lastName:  document.getElementById('f-last').value.trim(),
+        email:     document.getElementById('f-email').value.trim(),
+        phone:     document.getElementById('f-phone').value.trim(),
+        company:   document.getElementById('f-company').value.trim(),
+        address:   document.getElementById('f-address').value.trim(),
+        notes:     document.getElementById('f-notes').value.trim()
+      };
+
+      if (!body.firstName || !body.lastName) {
+        document.getElementById('modal-msg').textContent = 'First and last name are required.';
+        return;
+      }
+
+      const url    = id ? `/api/customers/${id}` : '/api/customers';
+      const method = id ? 'PUT' : 'POST';
+
+      try {
+        const res  = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        if (data.success) { closeModal(); loadCustomers(); }
+        else document.getElementById('modal-msg').textContent = data.message || 'Save failed.';
+      } catch { document.getElementById('modal-msg').textContent = 'Connection error.'; }
+    }
+
+    async function deleteCustomer(id) {
+      if (!confirm('Delete this customer? This cannot be undone.')) return;
+      const token = Auth.getToken();
+      try {
+        await fetch(`/api/customers/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+        loadCustomers();
+      } catch {}
+    }
+
+    // Close modal on overlay click
+    document.getElementById('modalOverlay').addEventListener('click', e => {
+      if (e.target === e.currentTarget) closeModal();
+    });
+
+    loadCustomers();
+  </script>
+</body>
+</html>

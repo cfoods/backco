@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Backco — Invoices</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Outfit', sans-serif; background: #f5f5f3; color: #1a1a1a; }
+    #page-content { padding-top: 64px; }
+    .page { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+
+    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+    .page-title  { font-size: 1.6rem; font-weight: 700; }
+
+    .btn-primary {
+      padding: 0.6rem 1.25rem;
+      background: #1c3d2e;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-primary:hover { background: #245038; }
+
+    .toolbar { display: flex; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .search-input {
+      flex: 1; min-width: 220px;
+      padding: 0.6rem 1rem;
+      border: 1px solid #e5e5e1;
+      border-radius: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.88rem;
+      background: #fff;
+      outline: none;
+    }
+    .search-input:focus { border-color: #1c3d2e; }
+
+    select {
+      padding: 0.6rem 1rem;
+      border: 1px solid #e5e5e1;
+      border-radius: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.88rem;
+      background: #fff;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .card { background: #fff; border: 1px solid #e5e5e1; border-radius: 10px; overflow: hidden; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      padding: 0.75rem 1.25rem;
+      text-align: left;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #9ca3af;
+      background: #fafafa;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    td { padding: 1rem 1.25rem; font-size: 0.88rem; border-bottom: 1px solid #f9f9f8; color: #374151; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fafaf9; }
+
+    .inv-num { font-weight: 700; color: #1c3d2e; text-decoration: none; }
+    .inv-num:hover { text-decoration: underline; }
+
+    .badge { display: inline-block; padding: 0.2rem 0.65rem; border-radius: 20px; font-size: 0.72rem; font-weight: 600; }
+    .badge-paid    { background: #dcfce7; color: #16a34a; }
+    .badge-pending { background: #fef9c3; color: #ca8a04; }
+    .badge-overdue { background: #fee2e2; color: #dc2626; }
+    .badge-draft   { background: #f3f4f6; color: #6b7280; }
+
+    .action-link { color: #1c3d2e; text-decoration: none; font-weight: 500; font-size: 0.82rem; cursor: pointer; background: none; border: none; padding: 0; font-family: 'Outfit', sans-serif; margin-right: 0.75rem; }
+    .action-link:hover { text-decoration: underline; }
+    .action-del { color: #dc2626; }
+
+    .empty-state { text-align: center; padding: 3rem; color: #9ca3af; font-size: 0.88rem; }
+
+    .total-row { display: flex; gap: 2rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .total-item { font-size: 0.88rem; color: #6b7280; }
+    .total-item strong { color: #1a1a1a; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <div id="header-placeholder"></div>
+
+  <div id="page-content" style="display:none">
+    <div class="page">
+      <div class="page-header">
+        <div class="page-title">Invoices</div>
+        <a href="/admin/invoice" class="btn-primary">+ New Invoice</a>
+      </div>
+
+      <div class="total-row">
+        <div class="total-item">Total: <strong id="t-total">$0.00</strong></div>
+        <div class="total-item">Paid: <strong id="t-paid" style="color:#16a34a">$0.00</strong></div>
+        <div class="total-item">Pending: <strong id="t-pending" style="color:#ca8a04">$0.00</strong></div>
+        <div class="total-item">Overdue: <strong id="t-overdue" style="color:#dc2626">$0.00</strong></div>
+      </div>
+
+      <div class="toolbar">
+        <input class="search-input" id="searchInput" type="text" placeholder="Search by customer or invoice #..." oninput="filterInvoices()" />
+        <select id="statusFilter" onchange="filterInvoices()">
+          <option value="">All Statuses</option>
+          <option value="paid">Paid</option>
+          <option value="pending">Pending</option>
+          <option value="overdue">Overdue</option>
+          <option value="draft">Draft</option>
+        </select>
+      </div>
+
+      <div class="card">
+        <table>
+          <thead>
+            <tr>
+              <th>Invoice #</th>
+              <th>Customer</th>
+              <th>Date</th>
+              <th>Due Date</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="invoice-list">
+            <tr><td colspan="7" class="empty-state">No invoices yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/backco-auth.js"></script>
+  <script src="/js/admin-init.js"></script>
+  <script>
+    initAdmin('invoices');
+
+    let invoices = [];
+
+    async function loadInvoices() {
+      const token = Auth.getToken();
+      try {
+        const res  = await fetch('/api/invoices', { headers: { Authorization: `Bearer ${token}` } });
+        const data = await res.json();
+        if (data.success) {
+          invoices = data.data;
+          updateTotals(invoices);
+          renderInvoices(invoices);
+        }
+      } catch {}
+    }
+
+    function updateTotals(list) {
+      const sum = (status) => list.filter(i => i.status === status).reduce((s, i) => s + i.total, 0);
+      const fmt = (n) => '$' + n.toFixed(2);
+      document.getElementById('t-total').textContent   = fmt(list.reduce((s,i) => s + i.total, 0));
+      document.getElementById('t-paid').textContent    = fmt(sum('paid'));
+      document.getElementById('t-pending').textContent = fmt(sum('pending'));
+      document.getElementById('t-overdue').textContent = fmt(sum('overdue'));
+    }
+
+    function renderInvoices(list) {
+      const tbody = document.getElementById('invoice-list');
+      if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No invoices found.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = list.map(inv => `
+        <tr>
+          <td><a href="/admin/invoice?id=${inv._id}" class="inv-num">#${inv.invoiceNumber}</a></td>
+          <td>${inv.customerName || '—'}</td>
+          <td>${inv.date ? new Date(inv.date).toLocaleDateString() : '—'}</td>
+          <td>${inv.dueDate ? new Date(inv.dueDate).toLocaleDateString() : '—'}</td>
+          <td style="font-weight:600">$${inv.total.toFixed(2)}</td>
+          <td><span class="badge badge-${inv.status}">${inv.status}</span></td>
+          <td>
+            <a href="/admin/invoice?id=${inv._id}" class="action-link">Edit</a>
+            <button class="action-link" onclick="markPaid('${inv._id}')">Mark Paid</button>
+            <button class="action-link action-del" onclick="deleteInvoice('${inv._id}')">Delete</button>
+          </td>
+        </tr>`).join('');
+    }
+
+    function filterInvoices() {
+      const q      = document.getElementById('searchInput').value.toLowerCase();
+      const status = document.getElementById('statusFilter').value;
+      renderInvoices(invoices.filter(i =>
+        (!status || i.status === status) &&
+        (`#${i.invoiceNumber} ${i.customerName}`.toLowerCase().includes(q))
+      ));
+    }
+
+    async function markPaid(id) {
+      const token = Auth.getToken();
+      try {
+        await fetch(`/api/invoices/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ status: 'paid' })
+        });
+        loadInvoices();
+      } catch {}
+    }
+
+    async function deleteInvoice(id) {
+      if (!confirm('Delete this invoice? This cannot be undone.')) return;
+      const token = Auth.getToken();
+      try {
+        await fetch(`/api/invoices/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+        loadInvoices();
+      } catch {}
+    }
+
+    loadInvoices();
+  </script>
+</body>
+</html>

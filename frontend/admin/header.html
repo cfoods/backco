@@ -1,0 +1,170 @@
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  .site-header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 64px;
+    background: #fff;
+    border-bottom: 1px solid #e5e5e1;
+    display: flex;
+    align-items: center;
+    padding: 0 1.5rem;
+    gap: 1.5rem;
+    z-index: 100;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    font-family: 'Outfit', sans-serif;
+  }
+
+  .h-brand img {
+    height: 42px;
+    width: auto;
+    display: block;
+  }
+
+  .h-links {
+    display: flex;
+    align-items: center;
+    gap: 0.15rem;
+    flex: 1;
+  }
+
+  .nav-link {
+    padding: 0.45rem 0.9rem;
+    border-radius: 6px;
+    color: #4b5563;
+    font-size: 0.88rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .nav-link:hover  { background: #f3f4f6; color: #1c3d2e; }
+  .nav-link.active { background: rgba(28,61,46,0.1); color: #1c3d2e; font-weight: 600; }
+
+  /* Dropdown */
+  .h-dropdown { position: relative; }
+
+  .h-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    background: #fff;
+    border: 1px solid #e5e5e1;
+    border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    min-width: 190px;
+    overflow: hidden;
+    z-index: 200;
+  }
+
+  .h-dropdown:hover .h-dropdown-menu { display: block; }
+
+  .h-dropdown-menu a {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.75rem 1rem;
+    color: #374151;
+    text-decoration: none;
+    font-size: 0.87rem;
+    font-weight: 500;
+    transition: background 0.1s;
+    font-family: 'Outfit', sans-serif;
+  }
+
+  .h-dropdown-menu a:hover { background: #f9fafb; color: #1c3d2e; }
+
+  .h-dropdown-menu .dm-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: rgba(28,61,46,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+
+  .h-right {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+  }
+
+  .h-user {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.82rem;
+    color: #6b7280;
+    font-family: 'Outfit', sans-serif;
+  }
+
+  .h-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #1c3d2e;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    font-family: 'Outfit', sans-serif;
+  }
+
+  .h-signout {
+    padding: 0.4rem 1rem;
+    border: 1px solid #e5e5e1;
+    border-radius: 6px;
+    background: transparent;
+    color: #6b7280;
+    font-size: 0.82rem;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .h-signout:hover { border-color: #1c3d2e; color: #1c3d2e; }
+</style>
+
+<header class="site-header">
+  <a class="h-brand" href="/admin">
+    <img src="/assets/bradylogo.png" alt="Backcountry Landscape Construction" />
+  </a>
+
+  <nav class="h-links">
+    <a href="/admin" class="nav-link" data-page="dashboard">Dashboard</a>
+
+    <div class="h-dropdown">
+      <a href="/admin/create" class="nav-link" data-page="create">Create ▾</a>
+      <div class="h-dropdown-menu">
+        <a href="/admin/invoice">
+          <span class="dm-icon">🧾</span> New Invoice
+        </a>
+        <a href="/admin/estimate">
+          <span class="dm-icon">📋</span> New Estimate
+        </a>
+      </div>
+    </div>
+
+    <a href="/admin/invoices"  class="nav-link" data-page="invoices">Invoices</a>
+    <a href="/admin/expenses"  class="nav-link" data-page="expenses">Expenses</a>
+    <a href="/admin/customers" class="nav-link" data-page="customers">Customers</a>
+    <a href="/admin/profit"    class="nav-link" data-page="profit">Profit</a>
+    <a href="/admin/tax"       class="nav-link" data-page="tax">Tax</a>
+  </nav>
+
+  <div class="h-right">
+    <div class="h-user">
+      <div class="h-avatar" id="header-avatar">?</div>
+      <span id="header-username">—</span>
+    </div>
+    <button class="h-signout" onclick="Auth.logout()">Sign Out</button>
+  </div>
+</header>

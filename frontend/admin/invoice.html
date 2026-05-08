@@ -22,6 +22,10 @@
     .btn-secondary:hover { border-color: #1c3d2e; color: #1c3d2e; }
     .btn-danger { background: #fee2e2; color: #dc2626; }
     .btn-danger:hover { background: #fecaca; }
+    .btn-send { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+    .btn-send:hover { background: #dbeafe; }
+    .btn-pay  { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+    .btn-pay:hover  { background: #dcfce7; }
 
     /* Sections */
     .section {
@@ -120,6 +124,7 @@
     .msg-bar.show { display: block; }
     .msg-bar.success { background: #dcfce7; color: #16a34a; }
     .msg-bar.error   { background: #fee2e2; color: #dc2626; }
+    .msg-bar.info    { background: #eff6ff; color: #1d4ed8; }
 
     @media (max-width: 640px) {
       .field-row, .field-row-3 { grid-template-columns: 1fr; }
@@ -136,12 +141,15 @@
         <div class="actions">
           <button class="btn btn-secondary" onclick="window.location='/admin/invoices'">← Back</button>
           <button class="btn btn-secondary" id="btn-pdf" style="display:none" onclick="downloadPDF()">⬇ Download PDF</button>
+          <button class="btn btn-send" id="btn-send" style="display:none" onclick="sendInvoice()">✉ Send Invoice</button>
+          <button class="btn btn-pay" id="btn-pay" style="display:none" onclick="payInvoice()">💳 Payment Link</button>
           <button class="btn btn-secondary" id="btn-draft" onclick="saveInvoice('draft')">Save Draft</button>
           <button class="btn btn-primary" onclick="saveInvoice('pending')">Save Invoice</button>
         </div>
       </div>
 
       <div class="msg-bar" id="msgBar"></div>
+      <div id="autosave-status" style="font-size:0.78rem;color:#9ca3af;margin-bottom:0.5rem;min-height:1rem;text-align:right;"></div>
 
       <!-- Customer -->
       <div class="section">
@@ -284,6 +292,8 @@
         document.getElementById('page-title').textContent = 'Edit Invoice';
         document.getElementById('btn-delete').style.display = 'inline-block';
         document.getElementById('btn-pdf').style.display    = 'inline-block';
+        document.getElementById('btn-send').style.display   = 'inline-block';
+        document.getElementById('btn-pay').style.display    = 'inline-block';
         loadInvoice(editId);
       } else {
         addLine(); // start with one empty line
@@ -308,6 +318,7 @@
         if (inv.customerId) selectCustomer({ _id: inv.customerId, firstName: inv.customerFirstName, lastName: inv.customerLastName, email: inv.customerEmail });
         (inv.lineItems || []).forEach(li => addLine(li));
         calcTotals();
+        startAutoSave();
       } catch {}
     }
 
@@ -470,7 +481,10 @@
             editId = data.data._id;
             document.getElementById('btn-delete').style.display = 'inline-block';
             document.getElementById('btn-pdf').style.display    = 'inline-block';
+            document.getElementById('btn-send').style.display   = 'inline-block';
+            document.getElementById('btn-pay').style.display    = 'inline-block';
             history.replaceState(null, '', `/admin/invoice?id=${editId}`);
+            startAutoSave();
           }
         } else showMsg(data.message || 'Save failed.', 'error');
       } catch { showMsg('Connection error.', 'error'); }
@@ -485,6 +499,82 @@
       } catch { showMsg('Delete failed.', 'error'); }
     }
 
+    // ── Auto-save ──────────────────────────────────────────────────────────────
+    let autoSaveTimer = null;
+
+    function startAutoSave() {
+      // Watch all inputs for changes
+      document.querySelectorAll('input, select, textarea').forEach(el => {
+        el.addEventListener('input', scheduleAutoSave);
+        el.addEventListener('change', scheduleAutoSave);
+      });
+
+      // Also watch dynamically added line items via mutation observer
+      const observer = new MutationObserver(() => {
+        document.querySelectorAll('#line-items input').forEach(el => {
+          el.removeEventListener('input', scheduleAutoSave);
+          el.addEventListener('input', scheduleAutoSave);
+        });
+      });
+      observer.observe(document.getElementById('line-items'), { childList: true });
+    }
+
+    function scheduleAutoSave() {
+      if (!editId) return;
+      clearTimeout(autoSaveTimer);
+      setStatus('Unsaved changes...');
+      autoSaveTimer = setTimeout(() => autoSave(), 1500);
+    }
+
+    async function autoSave() {
+      if (!editId) return;
+      setStatus('Saving...');
+      const token     = Auth.getToken();
+      const lineItems = getLineItems();
+      const taxRate   = parseFloat(document.getElementById('tax-rate').value) || 0;
+      const discount  = parseFloat(document.getElementById('discount').value) || 0;
+      const sub       = lineItems.reduce((s, l) => s + l.amount, 0);
+      const total     = Math.max(sub + (sub * taxRate / 100) - discount, 0);
+      const body = {
+        customerId:    document.getElementById('customerId').value || null,
+        invoiceNumber: document.getElementById('f-number').value,
+        date:          document.getElementById('f-date').value,
+        dueDate:       document.getElementById('f-due').value,
+        status:        document.getElementById('f-status').value,
+        jobName:       document.getElementById('f-job').value,
+        notes:         document.getElementById('f-notes').value,
+        lineItems, taxRate, discount, subtotal: sub, total
+      };
+      try {
+        const res = await fetch(`/api/invoices/${editId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        setStatus(data.success ? '✓ Saved' : 'Save failed');
+        setTimeout(() => setStatus(''), 2000);
+      } catch { setStatus('Save failed'); }
+    }
+
+    function setStatus(msg) {
+      const el = document.getElementById('autosave-status');
+      if (el) el.textContent = msg;
+    }
+
+    // ── Send Invoice (email — coming soon) ────────────────────────────────────
+    function sendInvoice() {
+      // TODO: Hook up Microsoft/Outlook email integration
+      showMsg('Email sending coming soon — Microsoft email integration will be added here.', 'info');
+    }
+
+    // ── Payment Link (Stripe — coming soon) ───────────────────────────────────
+    function payInvoice() {
+      // TODO: Hook up Stripe payment link generation
+      showMsg('Payment links coming soon — Stripe integration will be added here.', 'info');
+    }
+
+    // ── PDF Download ───────────────────────────────────────────────────────────
     async function downloadPDF() {
       if (!editId) { showMsg('Save the invoice first.', 'error'); return; }
       const token = Auth.getToken();

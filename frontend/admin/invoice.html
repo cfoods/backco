@@ -135,6 +135,7 @@
         <div class="page-title" id="page-title">New Invoice</div>
         <div class="actions">
           <button class="btn btn-secondary" onclick="window.location='/admin/invoices'">← Back</button>
+          <button class="btn btn-secondary" id="btn-pdf" style="display:none" onclick="downloadPDF()">⬇ Download PDF</button>
           <button class="btn btn-secondary" id="btn-draft" onclick="saveInvoice('draft')">Save Draft</button>
           <button class="btn btn-primary" onclick="saveInvoice('pending')">Save Invoice</button>
         </div>
@@ -282,6 +283,7 @@
       if (editId) {
         document.getElementById('page-title').textContent = 'Edit Invoice';
         document.getElementById('btn-delete').style.display = 'inline-block';
+        document.getElementById('btn-pdf').style.display    = 'inline-block';
         loadInvoice(editId);
       } else {
         addLine(); // start with one empty line
@@ -467,6 +469,7 @@
           if (!editId) {
             editId = data.data._id;
             document.getElementById('btn-delete').style.display = 'inline-block';
+            document.getElementById('btn-pdf').style.display    = 'inline-block';
             history.replaceState(null, '', `/admin/invoice?id=${editId}`);
           }
         } else showMsg(data.message || 'Save failed.', 'error');
@@ -480,6 +483,24 @@
         await fetch(`/api/invoices/${editId}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
         window.location = '/admin/invoices';
       } catch { showMsg('Delete failed.', 'error'); }
+    }
+
+    async function downloadPDF() {
+      if (!editId) { showMsg('Save the invoice first.', 'error'); return; }
+      const token = Auth.getToken();
+      try {
+        const res  = await fetch(`/api/invoices/${editId}/pdf`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!res.ok) { showMsg('PDF generation failed.', 'error'); return; }
+        const blob = await res.blob();
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        a.href     = url;
+        a.download = `invoice-${document.getElementById('f-number').value || editId}.pdf`;
+        a.click();
+        URL.revokeObjectURL(url);
+      } catch { showMsg('PDF download failed.', 'error'); }
     }
 
     function showMsg(msg, type) {

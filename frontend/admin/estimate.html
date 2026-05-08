@@ -83,6 +83,7 @@
         <div class="page-title" id="page-title">New Estimate <span class="est-badge">ESTIMATE</span></div>
         <div class="actions">
           <button class="btn btn-secondary" onclick="history.back()">← Back</button>
+          <button class="btn btn-secondary" id="btn-pdf" style="display:none" onclick="downloadPDF()">⬇ Download PDF</button>
           <button class="btn btn-convert" id="btn-convert" style="display:none" onclick="convertToInvoice()">Convert to Invoice</button>
           <button class="btn btn-primary" onclick="saveEstimate()">Save Estimate</button>
         </div>
@@ -332,7 +333,12 @@
         const data = await res.json();
         if (data.success) {
           showMsg('Estimate saved!', 'success');
-          if (!editId) { editId = data.data._id; history.replaceState(null,'',`/admin/estimate?id=${editId}`); document.getElementById('btn-convert').style.display = 'inline-block'; document.getElementById('btn-convert2').style.display = 'inline-block'; }
+          if (!editId) {
+            editId = data.data._id;
+            history.replaceState(null,'',`/admin/estimate?id=${editId}`);
+            document.getElementById('btn-convert').style.display = 'inline-block';
+            document.getElementById('btn-pdf').style.display     = 'inline-block';
+          }
         } else showMsg(data.message||'Save failed.', 'error');
       } catch { showMsg('Connection error.', 'error'); }
     }
@@ -346,6 +352,24 @@
         if (data.success) window.location = `/admin/invoice?id=${data.invoiceId}`;
         else showMsg(data.message||'Conversion failed.', 'error');
       } catch { showMsg('Connection error.', 'error'); }
+    }
+
+    async function downloadPDF() {
+      if (!editId) { showMsg('Save the estimate first.', 'error'); return; }
+      const token = Auth.getToken();
+      try {
+        const res  = await fetch(`/api/estimates/${editId}/pdf`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!res.ok) { showMsg('PDF generation failed.', 'error'); return; }
+        const blob = await res.blob();
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        a.href     = url;
+        a.download = `estimate-${document.getElementById('f-number').value || editId}.pdf`;
+        a.click();
+        URL.revokeObjectURL(url);
+      } catch { showMsg('PDF download failed.', 'error'); }
     }
 
     function showMsg(msg, type) {
